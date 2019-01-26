@@ -16,7 +16,7 @@ inbox.onmessage = function(message) {
         // 出力テスト
         console.log(file_reader.result); // "文字列テスト"
     };
-    file_reader.readAsText(message);
+    file_reader.readAsText(message.data);
     console.log(message.data)
     var data = message.data;
     $("#chat-text").append("<div class='panel panel-default'><div class='panel-heading'>" + $('<span/>').text(data.handle).html() + "</div><div class='panel-body'>" + $('<span/>').text(data.text).html() + "</div></div>");
