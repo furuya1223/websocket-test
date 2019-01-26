@@ -23,6 +23,7 @@ def message_received(client, server, message):
 
 # Main
 def main():
+    print('start')
     server = WebsocketServer(port=3128, host='pywebsocket-test.herokuapp.com', loglevel=logging.INFO)
     server.set_fn_new_client(new_client)
     server.set_fn_client_left(client_left)
