@@ -75,7 +75,6 @@ def inbox(ws):
     """Receives incoming chat messages, inserts them into Redis."""
     while not ws.closed:
         # Sleep to prevent *constant* context-switches.
-        time.sleep(0.1)
         message = ws.receive()
 
         if message:
@@ -89,7 +88,6 @@ def outbox(ws):
 
     while not ws.closed:
         # Context switch while `ChatBackend.start` is running in the background.
-        time.sleep(0.1)
 
 
 
