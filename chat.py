@@ -8,9 +8,9 @@ This simple application uses WebSockets to run a primitive chat server.
 """
 
 import os
+import time
 import logging
 import redis
-import gevent
 from flask import Flask, render_template
 from flask_sockets import Sockets
 
@@ -56,11 +56,11 @@ class ChatBackend(object):
         """Listens for new messages in Redis, and sends them to clients."""
         for data in self.__iter_data():
             for client in self.clients:
-                gevent.spawn(self.send, client, data)
+                self.send(client, data)
 
     def start(self):
         """Maintains Redis subscription in the background."""
-        gevent.spawn(self.run)
+        self.run()
 
 chats = ChatBackend()
 chats.start()
@@ -75,7 +75,7 @@ def inbox(ws):
     """Receives incoming chat messages, inserts them into Redis."""
     while not ws.closed:
         # Sleep to prevent *constant* context-switches.
-        gevent.sleep(0.1)
+        time.sleep(0.1)
         message = ws.receive()
 
         if message:
@@ -89,7 +89,7 @@ def outbox(ws):
 
     while not ws.closed:
         # Context switch while `ChatBackend.start` is running in the background.
-        gevent.sleep(0.1)
+        time.sleep(0.1)
 
 
 
