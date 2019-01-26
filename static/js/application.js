@@ -10,7 +10,7 @@ var inbox = new ReconnectingWebSocket(ws_scheme + location.host + "/receive");
 var outbox = new ReconnectingWebSocket(ws_scheme + location.host + "/submit");
 
 inbox.onmessage = function(message) {
-  var data = JSON.parse(message.data);
+  var data = message.data;
   $("#chat-text").append("<div class='panel panel-default'><div class='panel-heading'>" + $('<span/>').text(data.handle).html() + "</div><div class='panel-body'>" + $('<span/>').text(data.text).html() + "</div></div>");
   $("#chat-text").stop().animate({
     scrollTop: $('#chat-text')[0].scrollHeight
