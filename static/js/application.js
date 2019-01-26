@@ -10,19 +10,17 @@ var outbox = new ReconnectingWebSocket(ws_scheme + location.host + "/submit");
 
 inbox.onmessage = function(message) {
     var file_reader = new FileReader();
+    
     file_reader.onloadend = function(e){
         // エラー
         if(file_reader.error) return;
-        // 出力テスト
-        console.log(file_reader.result); // "文字列テスト"
+        var data = JSON.parse(file_reader.result);
+        $("#chat-text").append("<div class='panel panel-default'><div class='panel-heading'>" + $('<span/>').text(data.handle).html() + "</div><div class='panel-body'>" + $('<span/>').text(data.text).html() + "</div></div>");
+        $("#chat-text").stop().animate({
+            scrollTop: $('#chat-text')[0].scrollHeight
+        }, 800);
     };
     file_reader.readAsText(message.data);
-    console.log(message.data)
-    var data = message.data;
-    $("#chat-text").append("<div class='panel panel-default'><div class='panel-heading'>" + $('<span/>').text(data.handle).html() + "</div><div class='panel-body'>" + $('<span/>').text(data.text).html() + "</div></div>");
-    $("#chat-text").stop().animate({
-        scrollTop: $('#chat-text')[0].scrollHeight
-    }, 800);
 };
 
 inbox.onclose = function(){
