@@ -10,6 +10,7 @@ This simple application uses WebSockets to run a primitive chat server.
 import os
 import time
 import logging
+import asyncio
 import redis
 from flask import Flask, render_template
 from flask_sockets import Sockets
@@ -70,24 +71,32 @@ chats.start()
 def hello():
     return render_template('index.html')
 
-@sockets.route('/submit')
-def inbox(ws):
+async def inbox(ws):
     """Receives incoming chat messages, inserts them into Redis."""
     while not ws.closed:
         # Sleep to prevent *constant* context-switches.
+        await asyncio.sleep(0.1)
         message = ws.receive()
 
         if message:
             app.logger.info(u'Inserting message: {}'.format(message))
             redis.publish(REDIS_CHAN, message)
 
-@sockets.route('/receive')
-def outbox(ws):
+@sockets.route('/submit')
+def inbox_async(ws):
+    loop = asyncio.get_event_loop()
+    loop.run_until_complete(inbox(ws))
+
+async def outbox(ws):
     """Sends outgoing chat messages, via `ChatBackend`."""
     chats.register(ws)
 
     while not ws.closed:
         # Context switch while `ChatBackend.start` is running in the background.
+        await asyncio.sleep(0.1)
 
-
+@sockets.route('/receive')
+def outbox_async(ws):
+    loop = asyncio.get_event_loop()
+    loop.run_until_complete(outbox(ws))
 
