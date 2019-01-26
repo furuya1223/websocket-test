@@ -5,7 +5,7 @@ if (window.location.protocol == "https:") {
   var ws_scheme = "ws://"
 };
 
-
+console.log(location.host)
 var inbox = new ReconnectingWebSocket(ws_scheme + location.host + "/receive");
 var outbox = new ReconnectingWebSocket(ws_scheme + location.host + "/submit");
 
