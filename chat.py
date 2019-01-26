@@ -85,7 +85,7 @@ async def inbox(ws):
 @sockets.route('/submit')
 def inbox_async(ws):
     loop = asyncio.get_event_loop()
-    loop.run_until_complete(inbox(ws))
+    loop.run_forever(inbox(ws))
 
 async def outbox(ws):
     """Sends outgoing chat messages, via `ChatBackend`."""
@@ -98,5 +98,5 @@ async def outbox(ws):
 @sockets.route('/receive')
 def outbox_async(ws):
     loop = asyncio.get_event_loop()
-    loop.run_until_complete(outbox(ws))
+    loop.run_forever(outbox(ws))
 
