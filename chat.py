@@ -8,10 +8,9 @@ This simple application uses WebSockets to run a primitive chat server.
 """
 
 import os
-import time
 import logging
-import asyncio
 import redis
+import gevent
 from flask import Flask, render_template
 from flask_sockets import Sockets
 
@@ -57,11 +56,11 @@ class ChatBackend(object):
         """Listens for new messages in Redis, and sends them to clients."""
         for data in self.__iter_data():
             for client in self.clients:
-                self.send(client, data)
+                gevent.spawn(self.send, client, data)
 
     def start(self):
         """Maintains Redis subscription in the background."""
-        self.run()
+        gevent.spawn(self.run)
 
 chats = ChatBackend()
 chats.start()
@@ -71,32 +70,26 @@ chats.start()
 def hello():
     return render_template('index.html')
 
-async def inbox(ws):
+@sockets.route('/submit')
+def inbox(ws):
     """Receives incoming chat messages, inserts them into Redis."""
     while not ws.closed:
         # Sleep to prevent *constant* context-switches.
-        await asyncio.sleep(0.1)
+        gevent.sleep(0.1)
         message = ws.receive()
 
         if message:
             app.logger.info(u'Inserting message: {}'.format(message))
             redis.publish(REDIS_CHAN, message)
 
-@sockets.route('/submit')
-def inbox_async(ws):
-    loop = asyncio.get_event_loop()
-    loop.run_forever(inbox(ws))
-
-async def outbox(ws):
+@sockets.route('/receive')
+def outbox(ws):
     """Sends outgoing chat messages, via `ChatBackend`."""
     chats.register(ws)
 
     while not ws.closed:
         # Context switch while `ChatBackend.start` is running in the background.
-        await asyncio.sleep(0.1)
+        gevent.sleep(0.1)
 
-@sockets.route('/receive')
-def outbox_async(ws):
-    loop = asyncio.get_event_loop()
-    loop.run_forever(outbox(ws))
+
 
