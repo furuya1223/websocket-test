@@ -64,7 +64,8 @@ class ChatBackend(object):
         """Maintains Redis subscription in the background."""
         gevent.spawn(self.run)
 
-chats
+chats = ChatBackend('test')
+chats.run()
 
 @app.route('/')
 def hello():

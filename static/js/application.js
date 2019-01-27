@@ -45,6 +45,5 @@ $("#input-form").on("submit", function(event) {
 $("#enter-form").on("submit", function(event) {
     event.preventDefault();
     var room = $("#input-room")[0].value;
-    outbox.send(JSON.stringify({ room: room }));
-    $("#input-text")[0].value = "";
+    enter.send(JSON.stringify({ room: room }));
 });
