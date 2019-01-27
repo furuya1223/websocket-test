@@ -5,6 +5,7 @@ if (window.location.protocol == "https:") {
     var ws_scheme = "ws://"
 };
 
+var enter = new ReconnectingWebSocket(ws_scheme + location.host + "/enter");
 var inbox = new ReconnectingWebSocket(ws_scheme + location.host + "/receive");
 var outbox = new ReconnectingWebSocket(ws_scheme + location.host + "/submit");
 
@@ -38,5 +39,12 @@ $("#input-form").on("submit", function(event) {
     var handle = $("#input-handle")[0].value;
     var text   = $("#input-text")[0].value;
     outbox.send(JSON.stringify({ handle: handle, text: text }));
+    $("#input-text")[0].value = "";
+});
+
+$("#enter-form").on("submit", function(event) {
+    event.preventDefault();
+    var room = $("#input-room")[0].value;
+    outbox.send(JSON.stringify({ room: room }));
     $("#input-text")[0].value = "";
 });
